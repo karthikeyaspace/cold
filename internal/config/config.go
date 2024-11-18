@@ -14,6 +14,7 @@ type Config struct {
 	Port  string
 	Host  string
 	Batch int
+	AiKey string
 }
 
 func LoadEnv() (*Config, error) {
@@ -32,6 +33,7 @@ func LoadEnv() (*Config, error) {
 		Port:  "587",
 		Host:  "smtp.gmail.com",
 		Batch: batchSize,
+		AiKey: os.Getenv("AI_KEY"),
 	}
 
 	if cfg.Email == "" || cfg.Pass == "" {
