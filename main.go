@@ -17,12 +17,14 @@ func main() {
 		log.Fatalf("Error loading config: %v", err)
 	}
 
-	excelData, err := utils.ReadExcelData("data.xlsx")
+	start := time.Now()
+
+	excelData, err := utils.ReadExcelData("data/data.xlsx")
 	if err != nil {
 		log.Fatalf("Error reading excel data: %v", err)
 	}
 
-	client, err := smtp.NewMailClient(cfg)
+	smtpClient, err := smtp.NewMailClient(cfg)
 	if err != nil {
 		log.Fatalf("Error creating mail client: %v", err)
 	}
@@ -32,22 +34,26 @@ func main() {
 		log.Fatalf("Error creating AI client: %v", err)
 	}
 
-	defer client.CloseConn()
+	defer smtpClient.CloseConn()
 
 	from := cfg.Email
-	start := time.Now()
 
 	for _, row := range excelData {
 		mailContent, err := aiClient.GenerateMail(row)
 		if err != nil {
 			log.Fatalf("Error generating mail content: %v", err)
 		}
-		
+
+		err = smtpClient.SendMail(from, row.Email, mailContent.Subject, mailContent.HTML, "data/resume.pdf")
+		if err != nil {
+			log.Fatalf("Error sending mail: %v", err)
+		}
+
+		fmt.Println("Mail sent to ", row.Email, " from ", from)
+		time.Sleep(time.Second * time.Duration(cfg.Delay))
 	}
 
 	elapsed := time.Since(start)
-
 	fmt.Println("Mails sent successfully")
-
 	fmt.Printf("Time taken: %v\n", elapsed)
 }

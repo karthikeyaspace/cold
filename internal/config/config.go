@@ -15,6 +15,9 @@ type Config struct {
 	Host  string
 	Batch int
 	AiKey string
+	Delay int
+	ResumePath string
+	DataPath string
 }
 
 func LoadEnv() (*Config, error) {
@@ -27,6 +30,11 @@ func LoadEnv() (*Config, error) {
 		batchSize, _ = strconv.Atoi(val)
 	}
 
+	delay, err := strconv.Atoi(os.Getenv("DELAY"))
+	if err != nil {
+		return &Config{}, fmt.Errorf("error parsing delay: %v, not present in env", err)
+	}
+
 	cfg := &Config{
 		Email: os.Getenv("EMAIL"),
 		Pass:  os.Getenv("PASS"),
@@ -34,6 +42,9 @@ func LoadEnv() (*Config, error) {
 		Host:  "smtp.gmail.com",
 		Batch: batchSize,
 		AiKey: os.Getenv("AI_KEY"),
+		Delay: delay,
+		ResumePath: os.Getenv("data/resume.pdf"),
+		DataPath: os.Getenv("data/data.xlsx"), 
 	}
 
 	if cfg.Email == "" || cfg.Pass == "" {

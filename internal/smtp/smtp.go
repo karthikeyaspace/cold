@@ -1,8 +1,12 @@
 package smtp
 
 import (
+	"bytes"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
+	"mime/multipart"
 	"net/smtp"
 
 	"github.com/karthikeyaspace/gomailer/internal/config"
@@ -37,7 +41,7 @@ func NewMailClient(cfg *config.Config) (*MailClient, error) {
 	return &MailClient{client: client, auth: auth}, nil
 }
 
-func (mc *MailClient) SendMail(from, to, subject, body, html string) error {
+func (mc *MailClient) SendMail(from, to, subject, html, resumePath string) error {
 
 	if err := mc.client.Mail(from); err != nil {
 		fmt.Println("Error while sending mail from:", err)
@@ -54,15 +58,59 @@ func (mc *MailClient) SendMail(from, to, subject, body, html string) error {
 
 	defer writer.Close()
 
-	msg := fmt.Sprintf(
-		"From: %s\r\n"+
-			"To: %s\r\n"+
-			"Subject: %s\r\n"+
-			"Content-Type: text/html; charset=UTF-8\r\n\r\n"+
-			"%s\r\n%s",
-		from, to, subject, body, html,
-	)
-	if _, err = writer.Write([]byte(msg)); err != nil {
+	fileContent, err := ioutil.ReadFile(resumePath)
+	if err != nil {
+		return fmt.Errorf("failed to read resume file: %w", err)
+	}
+
+	encodedFile := []byte(base64.StdEncoding.EncodeToString(fileContent))
+
+	var body bytes.Buffer
+	multipartWriter := multipart.NewWriter(&body)
+
+	headers := map[string]string{
+		"From":         from,
+		"To":           to,
+		"Subject":      subject,
+		"MIME-Version": "1.0",
+		"Content-Type": fmt.Sprintf("multipart/mixed; boundary=%s", multipartWriter.Boundary()),
+	}
+
+	for k, v := range headers {
+		body.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
+	}
+	body.WriteString("\r\n")
+
+	htmlPart, err := multipartWriter.CreatePart(map[string][]string{
+		"Content-Type": {"text/html; charset=utf-8"},
+	})
+
+	if err != nil {
+		return fmt.Errorf("failed to create html part: %w", err)
+	}
+	if _, err = htmlPart.Write([]byte(html)); err != nil {
+		return fmt.Errorf("failed to write html: %w", err)
+	}
+
+	filePart, err := multipartWriter.CreatePart(map[string][]string{
+		"Content-Type":              {"application/pdf"},
+		"Content-Transfer-Encoding": {"base64"},
+		"Content-Disposition":       {`attachment; filename="resume.pdf"`},
+	})
+
+	if err != nil {
+		return fmt.Errorf("failed to create file part: %w", err)
+	}
+
+	if _, err = filePart.Write(encodedFile); err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+
+	if err = multipartWriter.Close(); err != nil {
+		return fmt.Errorf("failed to close multipart writer: %w", err)
+	}
+
+	if _, err = writer.Write([]byte(body.Bytes())); err != nil {
 		return fmt.Errorf("failed to write email: %w", err)
 	}
 
