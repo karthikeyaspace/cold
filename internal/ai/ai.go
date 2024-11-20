@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/google/generative-ai-go/genai"
 	"github.com/karthikeyaspace/gomailer/internal/config"
@@ -96,7 +95,7 @@ func (ai *AIClient) GenerateMail(mailData utils.ExcelData) (AIRes, error) {
 	}
 
 	var res AIRes
-	resContent := removeFirstAndLastLine(string(response.Candidates[0].Content.Parts[0].(genai.Text)))
+	resContent := utils.RemoveFirstAndLastLine(string(response.Candidates[0].Content.Parts[0].(genai.Text)))
 
 	if err := json.Unmarshal([]byte(resContent), &res); err != nil {
 		return AIRes{}, fmt.Errorf("error unmarshalling response: %v", err)
@@ -105,11 +104,4 @@ func (ai *AIClient) GenerateMail(mailData utils.ExcelData) (AIRes, error) {
 	return res, nil
 }
 
-func removeFirstAndLastLine(input string) string {
-	input = strings.ReplaceAll(input, "```", "")
-	lines := strings.Split(input, "\n")
-	if len(lines) <= 2 {
-		return ""
-	}
-	return strings.Join(lines[1:len(lines)-1], "\n")
-}
+

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -61,4 +62,13 @@ func ReadExcelData(filePath string) ([]ExcelData, error) {
 
 	return data, nil
 
+}
+
+func RemoveFirstAndLastLine(input string) string {
+	input = strings.ReplaceAll(input, "```", "")
+	lines := strings.Split(input, "\n")
+	if len(lines) <= 2 {
+		return ""
+	}
+	return strings.Join(lines[1:len(lines)-1], "\n")
 }

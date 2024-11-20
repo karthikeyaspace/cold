@@ -26,6 +26,7 @@ func NewMailClient(cfg *config.Config) (*MailClient, error) {
 		return nil, fmt.Errorf("failed to dail to %s smtp address: %v", addr, err)
 	}
 
+	// google smtp server requires tls :)
 	tls := &tls.Config{
 		ServerName: cfg.Host,
 	}
