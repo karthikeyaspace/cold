@@ -5,9 +5,9 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"mime/multipart"
 	"net/smtp"
+	"os"
 
 	"github.com/karthikeyaspace/gomailer/internal/config"
 )
@@ -42,7 +42,7 @@ func NewMailClient(cfg *config.Config) (*MailClient, error) {
 	return &MailClient{client: client, auth: auth}, nil
 }
 
-func (mc *MailClient) SendMail(from, to, subject, html, resumePath string) error {
+func (mc *MailClient) SendMail(from, to, subject, html string, resumePath *string) error {
 
 	if err := mc.client.Mail(from); err != nil {
 		fmt.Println("Error while sending mail from:", err)
@@ -59,7 +59,7 @@ func (mc *MailClient) SendMail(from, to, subject, html, resumePath string) error
 
 	defer writer.Close()
 
-	fileContent, err := ioutil.ReadFile(resumePath)
+	fileContent, err := os.ReadFile(*resumePath)
 	if err != nil {
 		return fmt.Errorf("failed to read resume file: %w", err)
 	}

@@ -9,15 +9,15 @@ import (
 )
 
 type Config struct {
-	Email string
-	Pass  string
-	Port  string
-	Host  string
-	Batch int
-	AiKey string
-	Delay int
+	Email      string
+	Pass       string
+	Port       string
+	Host       string
+	Batch      int
+	AiKey      string
+	Delay      int
 	ResumePath string
-	DataPath string
+	DataPath   string
 }
 
 func LoadEnv() (*Config, error) {
@@ -36,15 +36,15 @@ func LoadEnv() (*Config, error) {
 	}
 
 	cfg := &Config{
-		Email: os.Getenv("EMAIL"),
-		Pass:  os.Getenv("PASS"),
-		Port:  "587",
-		Host:  "smtp.gmail.com",
-		Batch: batchSize,
-		AiKey: os.Getenv("AI_KEY"),
-		Delay: delay,
-		ResumePath: os.Getenv("data/resume.pdf"),
-		DataPath: os.Getenv("data/data.xlsx"), 
+		Email:      os.Getenv("EMAIL"),
+		Pass:       os.Getenv("PASS"),
+		Port:       "587",
+		Host:       "smtp.gmail.com",
+		Batch:      batchSize,
+		AiKey:      os.Getenv("AI_KEY"),
+		Delay:      delay,
+		ResumePath: os.Getenv("RESUME_PATH"),
+		DataPath:   os.Getenv("DATA_PATH"),
 	}
 
 	if cfg.Email == "" || cfg.Pass == "" {

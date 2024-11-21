@@ -20,8 +20,8 @@ type ExcelData struct {
 	Industry         string
 }
 
-func ReadExcelData(filePath string) ([]ExcelData, error) {
-	ff, err := excelize.OpenFile(filePath)
+func ReadExcelData(filePath *string) ([]ExcelData, error) {
+	ff, err := excelize.OpenFile(*filePath)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file at 1: %v", err)
 	}

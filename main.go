@@ -21,7 +21,7 @@ func main() {
 
 	fmt.Println("Config loaded successfully: ", time.Since(start))
 
-	excelData, err := utils.ReadExcelData("data/data.xlsx")
+	excelData, err := utils.ReadExcelData(&cfg.DataPath)
 	if err != nil {
 		log.Fatalf("Error reading excel data: %v", err)
 	}
@@ -56,7 +56,7 @@ func main() {
 
 		fmt.Println("mail content of ", i, "th main generated at", time.Since(start))
 
-		err = smtpClient.SendMail(from, row.Email, mailContent.Subject, mailContent.HTML, "data/resume.pdf")
+		err = smtpClient.SendMail(from, row.Email, mailContent.Subject, mailContent.HTML, &cfg.ResumePath)
 		if err != nil {
 			log.Fatalf("Error sending mail: %v", err)
 		}
