@@ -18,6 +18,7 @@ type Config struct {
 	Delay      int
 	ResumePath string
 	DataPath   string
+	ServerPort string
 }
 
 func LoadEnv() (*Config, error) {
@@ -45,6 +46,7 @@ func LoadEnv() (*Config, error) {
 		Delay:      delay,
 		ResumePath: os.Getenv("RESUME_PATH"),
 		DataPath:   os.Getenv("DATA_PATH"),
+		ServerPort: os.Getenv("SERVER_PORT"),
 	}
 
 	if cfg.Email == "" || cfg.Pass == "" {
