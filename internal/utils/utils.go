@@ -8,16 +8,13 @@ import (
 )
 
 type ExcelData struct {
+	Sno              string
 	Name             string
 	Email            string
 	Company          string
-	Position         string
-	CompanyType      string
 	ApplyingPosition string
 	AdditionalInfo   string
-	MutualInterests  string
 	ReasonForContact string
-	Industry         string
 }
 
 func ReadExcelData(filePath *string) ([]ExcelData, error) {
@@ -42,26 +39,19 @@ func ReadExcelData(filePath *string) ([]ExcelData, error) {
 		if i == 0 {
 			continue
 		}
-		if len(row) < 7 {
-			return nil, fmt.Errorf("excel file is invalid")
-		}
 		r := ExcelData{
-			Name:             row[0],
-			Email:            row[1],
-			Company:          row[2],
-			Position:         row[3],
-			CompanyType:      row[4],
-			ApplyingPosition: row[5],
-			AdditionalInfo:   row[6],
-			MutualInterests:  row[7],
-			ReasonForContact: row[8],
-			Industry:         row[9],
+			Sno:              row[0],
+			Name:             row[1],
+			Email:            row[2],
+			Company:          row[3],
+			ApplyingPosition: row[4],
+			AdditionalInfo:   row[5],
+			ReasonForContact: row[6],
 		}
 		data = append(data, r)
 	}
 
 	return data, nil
-
 }
 
 func RemoveFirstAndLastLine(input string) string {

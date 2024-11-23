@@ -70,13 +70,9 @@ func (ai *AIClient) GenerateMail(mailData utils.ExcelData) (AIRes, error) {
 		Mail Recipent details: 
 		- Name: %s
 		- Company Name: %s
-		- Position: %s
-		- Company Type: %s
 		- Applying Position: %s
 		- Additional Info: %s
-		- Mutual Interests: %s
 		- Reason for Contact: %s
-		- Industry: %s
 
 		Respond only with valid JSON in the following format:
 		{
@@ -87,7 +83,7 @@ func (ai *AIClient) GenerateMail(mailData utils.ExcelData) (AIRes, error) {
 		Do not respond with any thing else other than the JSON format. 
 		JUST JSON repsonse should start with` + "start with ```json and end with ```"
 
-	prompt := fmt.Sprintf(systemPrompt, mailData.Name, mailData.Company, mailData.Position, mailData.CompanyType, mailData.ApplyingPosition, mailData.AdditionalInfo, mailData.MutualInterests, mailData.ReasonForContact, mailData.Industry)
+	prompt := fmt.Sprintf(systemPrompt, mailData.Name, mailData.Company, mailData.ApplyingPosition, mailData.AdditionalInfo, mailData.ReasonForContact)
 
 	response, err := ai.model.GenerateContent(ai.ctx, genai.Text(prompt))
 	if err != nil {
@@ -103,5 +99,3 @@ func (ai *AIClient) GenerateMail(mailData utils.ExcelData) (AIRes, error) {
 
 	return res, nil
 }
-
-
