@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
 	"github.com/karthikeyaspace/gomailer/internal/ai"
 	"github.com/karthikeyaspace/gomailer/internal/config"
 	"github.com/karthikeyaspace/gomailer/internal/handler"
@@ -35,6 +36,7 @@ func Server() {
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
+	router.Use(CORS)
 
 	h := handler.NewHandler(cfg, smtpClient, aiClient)
 
@@ -47,7 +49,6 @@ func Server() {
 	if err := http.ListenAndServe(":"+cfg.ServerPort, router); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
-
 }
 
 func Loop() {
@@ -114,4 +115,19 @@ func Loop() {
 func main() {
 	Server()
 	// Loop()
+}
+
+func CORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

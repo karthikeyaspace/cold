@@ -17,6 +17,12 @@ type MailClient struct {
 	auth   smtp.Auth
 }
 
+type MailContent struct {
+	To      string `json:"to"`
+	Subject string `json:"subject"`
+	Body    string `json:"body"`
+}
+
 func NewMailClient(cfg *config.Config) (*MailClient, error) {
 	addr := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 	auth := smtp.PlainAuth("", cfg.Email, cfg.Pass, cfg.Host)
@@ -43,7 +49,6 @@ func NewMailClient(cfg *config.Config) (*MailClient, error) {
 }
 
 func (mc *MailClient) SendMail(from, to, subject, html string, resumePath *string) error {
-
 	if err := mc.client.Mail(from); err != nil {
 		fmt.Println("Error while sending mail from:", err)
 	}

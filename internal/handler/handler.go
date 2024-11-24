@@ -29,7 +29,7 @@ func (h *Handler) CloseConn() {
 	h.smtpClient.CloseConn()
 }
 
-// "GET" return the data from excel file 
+// "GET" return the data from excel file
 func (h *Handler) GetData(w http.ResponseWriter, r *http.Request) {
 	excelData, err := utils.ReadExcelData(&h.cfg.DataPath)
 	if err != nil {
@@ -37,8 +37,6 @@ func (h *Handler) GetData(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Println(excelData)
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(map[string]any{"success": true, "data": excelData}); err != nil {
@@ -60,6 +58,8 @@ func (h *Handler) GenerateMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(mailContent)
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(map[string]any{"success": true, "data": mailContent}); err != nil {
 		http.Error(w, "Failed to encode data", http.StatusInternalServerError)
@@ -74,5 +74,20 @@ func (h *Handler) EditMail(w http.ResponseWriter, r *http.Request) {
 
 // "POST" send the mail given the mail subject, body and email
 func (h *Handler) SendMail(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Send Mail"))
+	var mail smtp.MailContent
+	if err := json.NewDecoder(r.Body).Decode(&mail); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.smtpClient.SendMail(h.cfg.Email, mail.To, mail.Subject, mail.Body, &h.cfg.ResumePath); err != nil {
+		http.Error(w, "Failed to send mail", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(map[string]any{"success": true}); err != nil {
+		http.Error(w, "Failed to encode data", http.StatusInternalServerError)
+		return
+	}
 }

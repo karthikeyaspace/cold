@@ -17,6 +17,7 @@ type ExcelData struct {
 	ReasonForContact string
 }
 
+
 func ReadExcelData(filePath *string) ([]ExcelData, error) {
 	ff, err := excelize.OpenFile(*filePath)
 	if err != nil {
