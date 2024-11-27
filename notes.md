@@ -17,3 +17,9 @@ api design
 - /generate - generate mails using gpt and display in table
 - /edit - edit the generated mails
 - /send - send the mails
+
+
+
+more to do
+- send mail bug fix
+- add more fields to excel
