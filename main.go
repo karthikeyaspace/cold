@@ -54,6 +54,7 @@ func Server() {
 func Loop() {
 	start := time.Now()
 
+	
 	cfg, err := config.LoadEnv()
 	if err != nil {
 		log.Fatalf("Error loading config: %v", err)

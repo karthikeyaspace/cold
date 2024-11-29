@@ -21,5 +21,5 @@ api design
 
 
 more to do
-- send mail bug fix
-- add more fields to excel
+- write tests
+- make ui

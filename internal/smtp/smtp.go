@@ -20,7 +20,7 @@ type MailClient struct {
 type MailContent struct {
 	To      string `json:"to"`
 	Subject string `json:"subject"`
-	Body    string `json:"body"`
+	HTML    string `json:"html"`
 }
 
 func NewMailClient(cfg *config.Config) (*MailClient, error) {

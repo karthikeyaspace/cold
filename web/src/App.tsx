@@ -103,13 +103,20 @@ const App: React.FC = () => {
     setErrorMessages((prev) => ({ ...prev, [row.Sno]: "" }));
     setSuccessMessages((prev) => ({ ...prev, [row.Sno]: "" }));
 
+    console.log(
+      JSON.stringify({
+        To: row.Email,
+        Subject: emailContent.Subject,
+        HTML: emailContent.HTML,
+      })
+    );
     try {
       const res = await api.post(
         "/send",
         JSON.stringify({
-          To: row.Email,
-          Subject: emailContent.Subject,
-          HTML: emailContent.HTML,
+          to: row.Email,
+          subject: emailContent.Subject,
+          html: emailContent.HTML,
         })
       );
       if (res.data.success) {
@@ -118,7 +125,7 @@ const App: React.FC = () => {
           [row.Sno]: "Email sent successfully",
         }));
       } else {
-        throw new Error("Failed to send email");
+        throw new Error(res.statusText);
       }
     } catch (error) {
       setErrorMessages((prev) => ({

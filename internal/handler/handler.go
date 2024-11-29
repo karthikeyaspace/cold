@@ -80,7 +80,12 @@ func (h *Handler) SendMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.smtpClient.SendMail(h.cfg.Email, mail.To, mail.Subject, mail.Body, &h.cfg.ResumePath); err != nil {
+	if mail.To == "" || mail.Subject == "" || mail.HTML == "" {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.smtpClient.SendMail(h.cfg.Email, mail.To, mail.Subject, mail.HTML, &h.cfg.ResumePath); err != nil {
 		http.Error(w, "Failed to send mail", http.StatusInternalServerError)
 		return
 	}
